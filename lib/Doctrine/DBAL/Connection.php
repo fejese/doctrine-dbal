@@ -201,13 +201,8 @@ class Connection implements DriverConnection
             EventManager $eventManager = null)
     {
         $this->_driver = $driver;
-        $this->_params = $params;
 
-        if (isset($params['pdo'])) {
-            $this->_conn = $params['pdo'];
-            $this->_isConnected = true;
-            unset($this->_params['pdo']);
-        }
+        $this->setParams($params);
 
         // Create default config and event manager if none given
         if ( ! $config) {
@@ -224,6 +219,27 @@ class Connection implements DriverConnection
         $this->_expr = new Query\Expression\ExpressionBuilder($this);
 
         $this->autoCommit = $config->getAutoCommit();
+    }
+
+    /**
+     * Sets the parameters.
+     *
+     * Note that the connection won't be closed so in case the
+     * connection is persistent it needs to be closed manually
+     * otherwise there will be an inconsistency between the saved
+     * and used connection parameters. Use it with caution!
+     *
+     * @param array $params The connection parameters.
+     */
+    public function setParams(array $params)
+    {
+        $this->_params = $params;
+
+        if (isset($params['pdo'])) {
+            $this->_conn = $params['pdo'];
+            $this->_isConnected = true;
+            unset($this->_params['pdo']);
+        }
     }
 
     /**
